@@ -79,8 +79,8 @@ WSGI_APPLICATION = 'Pcasillas3_1.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'casillas',
-        'USER': 'bmrx',
+        'NAME': 'casillas2',
+        'USER': 'postgres',
         'PASSWORD': 'canaviri2002',
         'HOST': 'localhost',
         'PORT': '5432',

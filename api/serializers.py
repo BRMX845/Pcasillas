@@ -33,6 +33,10 @@ class UsuariosSerializer(serializers.ModelSerializer):
         group = Group.objects.get(name='cliente') # Cambia el nombre del grupo aquí
         user.groups.add(group)
         return user
+class UsuariosAlquilerSerializer():
+    class Meta:
+        model = Usuarios
+        fields=['id','username']
 class CasillaSerializer(serializers.ModelSerializer):
     departamento = DepartamentoSerializer()
     class Meta:
@@ -45,11 +49,18 @@ class CasillaSerializer(serializers.ModelSerializer):
         if not departamentos.exists():
             raise serializers.ValidationError(f"No existe el departamento {departamento_nombre}")
         departamento = departamentos.first()
-        casilla=Casilla.objects.create(departamento=departamento,**validated_data)
+        num_casilla = validated_data.get('num_Casilla')
+        casilla = Casilla.objects.filter(num_Casilla=num_casilla, departamento=departamento)
+        if casilla.exists():
+            raise serializers.ValidationError(f"Ya existe una casilla {num_casilla} en {departamento_nombre}")
+        else:
+            return Casilla.objects.create(departamento=departamento, **validated_data)
         return casilla
 class AlquilerCasillasSerializer(serializers.ModelSerializer):
     fk_casilla=CasillaSerializer()
+    fk_cliente=UsuariosAlquilerSerializer()
     class Meta:
         model = AlquilerCasillas
-        fields = ['id','fk_cliente','fk_casilla','fecha_inicio','fecha_fin','nro_contrato']
+        fields = ['id','fk_casilla','fecha_inicio','fecha_fin','nro_contrato','fk_cliente']
+
 
