@@ -1,12 +1,16 @@
 
 from rest_framework import serializers
-from .models import Usuarios, Casilla, AlquilerCasillas,Departamento
+from .models import Usuarios, Casilla, AlquilerCasillas,Departamento,Precio
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import Group
 
 from datetime import timedelta
 
 from django.contrib.auth.password_validation import validate_password
+class PrecioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Precio
+        fields='__all__'
 class DepartamentoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Departamento
@@ -19,7 +23,6 @@ class UsuariosSerializer(serializers.ModelSerializer):
         return make_password(value)
     class Meta:
         model = Usuarios
-        fields='__all__'
         fields = ['id','username','password','email','celular','ci','first_name','last_name','departamento']
     def create(self, validated_data):
         validated_data['is_superuser'] = False
@@ -73,13 +76,8 @@ class AlquilerCasillasSerializer(serializers.ModelSerializer):
         fields = ['id','fk_casilla','fecha_inicio','fecha_fin','nro_contrato','fk_cliente']
     def create(self, validated_data):
         username_data = validated_data.pop('fk_cliente')
-        username = username_data['username']
-
-        try:
-            usuario = Usuarios.objects.get(username=username)
-            raise serializers.ValidationError("Ya existe este usuario")
-        except Usuarios.DoesNotExist:
-            usuario = Usuarios.objects.create(username=username)  # Crear el usuario si no existe
+        username_user = username_data['username']
+        usuarios, created = Usuarios.objects.get_or_create(username=username_user)
 
         casilla_data = validated_data.pop('fk_casilla')
         departamento_data = casilla_data['departamento']
@@ -96,7 +94,5 @@ class AlquilerCasillasSerializer(serializers.ModelSerializer):
         if not casillas.exists():
             raise serializers.ValidationError(f"No existe la casilla {num_casilla} en el departamento {departamento_nombre}")
 
-        validated_data['fk_cliente'] = usuario
-        validated_data['fk_casilla'] = casillas.first()
-
-        return super().create(validated_data)
+        alquiler_casillas = AlquilerCasillas.objects.create(fk_cliente=usuarios, fk_casilla=casillas.first(), **validated_data)
+        return alquiler_casillas

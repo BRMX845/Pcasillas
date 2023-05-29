@@ -7,7 +7,7 @@ from django.contrib import admin
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin ,GroupAdmin
 from django.contrib.auth.models import Group
-from .models import Usuarios, Departamento, Casilla, AlquilerCasillas
+from .models import Usuarios, Departamento, Casilla, AlquilerCasillas,Precio
 
 admin.site.unregister(Group)
 
@@ -31,6 +31,7 @@ admin.site.register(Usuarios, UserAdmin)
 admin.site.register(Departamento)
 admin.site.register(Casilla)
 admin.site.register(AlquilerCasillas)
+admin.site.register(Precio)
 #admin.site.register(Usuarios.groups)
 @admin.register(Group)
 class CustomGroupAdmin(GroupAdmin):
