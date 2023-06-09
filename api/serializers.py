@@ -69,30 +69,36 @@ class CasillaSerializer(serializers.ModelSerializer):
             return Casilla.objects.create(departamento=departamento, **validated_data)
         return casilla
 class AlquilerCasillasSerializer(serializers.ModelSerializer):
-    fk_casilla=AlqCasillasSerializer()
-    fk_cliente=NombreUsuarioSerializer()
+    num_casilla = serializers.IntegerField(source='fk_casilla.num_Casilla')
+    departamento = serializers.CharField(source='fk_casilla.departamento.nombre')
+    fecha_inicio = serializers.DateField(format="%Y-%m-%d")
+    fecha_fin = serializers.DateField(format="%Y-%m-%d", required=False)
+    fk_cliente = serializers.CharField()
+
     class Meta:
         model = AlquilerCasillas
-        fields = ['id','fk_casilla','fecha_inicio','fecha_fin','nro_contrato','fk_cliente']
+        fields = ['id', 'num_casilla', 'departamento', 'fecha_inicio', 'fecha_fin', 'nro_contrato', 'fk_cliente']
+
     def create(self, validated_data):
-        username_data = validated_data.pop('fk_cliente')
-        username_user = username_data['username']
-        usuarios, created = Usuarios.objects.get_or_create(username=username_user)
+        fk_casilla_data = validated_data.pop('fk_casilla')
+        num_casilla = fk_casilla_data['num_Casilla']
+        departamento_nombre = fk_casilla_data['departamento']['nombre']
 
-        casilla_data = validated_data.pop('fk_casilla')
-        departamento_data = casilla_data['departamento']
-        departamento_nombre = departamento_data['nombre']
-        num_casilla = casilla_data['num_Casilla']
-
-        departamentos = Departamento.objects.filter(nombre=departamento_nombre)
-        if not departamentos.exists():
-            raise serializers.ValidationError(f"No existe el departamento {departamento_nombre}")
-
-        departamento = departamentos.first()
-
-        casillas = Casilla.objects.filter(num_Casilla=num_casilla, departamento=departamento)
-        if not casillas.exists():
+        casilla = Casilla.objects.filter(num_Casilla=num_casilla, departamento__nombre=departamento_nombre).first()
+        if not casilla:
             raise serializers.ValidationError(f"No existe la casilla {num_casilla} en el departamento {departamento_nombre}")
 
-        alquiler_casillas = AlquilerCasillas.objects.create(fk_cliente=usuarios, fk_casilla=casillas.first(), **validated_data)
+        if casilla.estado == "Ocupado":
+            raise serializers.ValidationError(f"La casilla {num_casilla} en el departamento {departamento_nombre} está ocupada")
+
+        casilla.estado = "Ocupado"
+        casilla.save()
+
+        fk_cliente = validated_data.pop('fk_cliente')
+
+        usuario = Usuarios.objects.filter(username=fk_cliente, departamento=casilla.departamento).first()
+        if not usuario:
+            raise serializers.ValidationError(f"No existe el usuario con nombre de {fk_cliente} en el departamento {casilla.departamento}")
+
+        alquiler_casillas = AlquilerCasillas.objects.create(fk_casilla=casilla, fk_cliente=usuario, **validated_data)
         return alquiler_casillas

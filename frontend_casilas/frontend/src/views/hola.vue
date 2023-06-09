@@ -40,8 +40,8 @@
               <v-container>
                 <v-row justify="space-between">
                   <v-col
-                    v-for="n in 20"
-                    :key="n"
+                    v-for="item in items"
+                    :key="item.id"
                     cols="auto"
                     md="1"
                   >
@@ -55,17 +55,13 @@
                         @click="toggle"
                       >
                         <v-scroll-y-transition>
-                          <div
-                            :color="blue"
-                            class="flex-grow-1 text-center"
-                          >
-                            {{ isSelected ? 'Seleccionado' : n }}
+                          <div class="flex-grow-1 text-center">
+                            {{ isSelected ? 'Seleccionado' : item.id }}
                           </div>
                         </v-scroll-y-transition>
                       </v-card>
                     </v-item>
                   </v-col>
-                  
                 </v-row>
               </v-container>
             </v-item-group>
@@ -77,13 +73,32 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
       selectedItems: [],
       expand: false,
-      drawer: true
+      drawer: true,
+      items: [] // Propiedad para almacenar los datos de la API
     };
+  },
+  created() {
+    this.fetchData(); // Llama a la función fetchData al crear el componente
+  },
+  methods: {
+    fetchData() {
+      // Realiza una solicitud a la API utilizando Axios (o cualquier otra librería de tu elección)
+      axios.get('http://127.0.0.1:8000/api/1.0/casillas')
+        .then(response => {
+          this.items = response.data; // Almacena los datos en la propiedad items
+          console.log(response.data);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    }
   }
 };
 </script>
