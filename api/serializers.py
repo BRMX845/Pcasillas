@@ -68,6 +68,15 @@ class CasillaSerializer(serializers.ModelSerializer):
         else:
             return Casilla.objects.create(departamento=departamento, **validated_data)
         return casilla
+    # def to_representation(self, instance):
+    #     data = super().to_representation(instance)
+    #     # Filtrar por el departamento deseado (puedes cambiar el ID del departamento según tus necesidades)
+    #     departamento_id = 1
+    #     if data['departamento']['id'] == departamento_id:
+    #         return data
+    #     else:
+    #         return None
+        
 class AlquilerCasillasSerializer(serializers.ModelSerializer):
     num_casilla = serializers.IntegerField(source='fk_casilla.num_Casilla')
     departamento = serializers.CharField(source='fk_casilla.departamento.nombre')

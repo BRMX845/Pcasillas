@@ -90,7 +90,7 @@ export default {
   methods: {
     fetchData() {
       // Realiza una solicitud a la API utilizando Axios (o cualquier otra librería de tu elección)
-      axios.get('http://127.0.0.1:8000/api/1.0/casillas/')
+      axios.get('http://172.65.14.246:8000/api/1.0/casillas/')
         .then(response => {
           this.items = response.data; // Almacena los datos en la propiedad items
           console.log(response.data);
