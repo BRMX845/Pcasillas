@@ -1,4 +1,7 @@
 <template>
+  <v-parallax
+    src="https://cdn.vuetifyjs.com/images/backgrounds/vbanner.jpg"
+  >
     <v-container fluid>
       <v-row justify="center" align="center">
         <v-col xs="12" sm="8" md="4">
@@ -17,12 +20,12 @@
                   </v-avatar>
                 </div>
                 <v-spacer></v-spacer>
-                <v-text-field v-model="email" label="Nombre de usuario" ></v-text-field>
+                <v-text-field v-model="username" label="Nombre de usuario" ></v-text-field>
                 <v-text-field v-model="password" label="Contraseña" type="password" required></v-text-field>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn type="submit" color="primary" >Iniciar session</v-btn>
+                <v-btn type="submit" color="primary" @click="login" >Iniciar session</v-btn>
                 <v-spacer></v-spacer>
               </v-card-actions>
             </v-form>
@@ -35,9 +38,12 @@
         </v-col>
       </v-row>
     </v-container>
+    </v-parallax>
   </template>
   
   <script>
+  import axios from 'axios';
+  
   export default {
     data() {
       return {
@@ -47,7 +53,21 @@
     },
     methods: {
       login() {
-        // Lógica de inicio de sesión
+        const loginData = {
+          username: this.username,
+          password: this.password,
+        };
+  
+        axios
+        .post('http://172.65.14.246:8000/api/1.0/login/', loginData)
+          .then(response => {
+            // Guardar el token en el almacenamiento local del navegador
+            localStorage.setItem('token', response.data.token);
+            this.$router.push('/casillas');
+          })
+          .catch(error => {
+            // Manejar el error de inicio de sesión
+          });
       },
     },
   };

@@ -3,8 +3,11 @@ from rest_framework import serializers
 from .models import Usuarios, Casilla, AlquilerCasillas,Departamento,Precio
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import Group
+from rest_framework import status
+from rest_framework.response import Response
 
 from datetime import timedelta
+from rest_framework.permissions import IsAuthenticated
 
 from django.contrib.auth.password_validation import validate_password
 class PrecioSerializer(serializers.ModelSerializer):
@@ -37,7 +40,13 @@ class UsuariosSerializer(serializers.ModelSerializer):
         user = Usuarios.objects.create_user(departamento=departamento,**validated_data)
         group = Group.objects.get(name='cliente') # Cambia el nombre del grupo aquí
         user.groups.add(group)
-        return user
+        response_data = {
+            'success': True,
+            'message': 'Usuario creado exitosamente.',
+            'user': self.data
+        }
+
+        return Response(response_data, status=status.HTTP_201_CREATED)
 
 class NombreUsuarioSerializer(serializers.ModelSerializer):
     class Meta:
@@ -54,6 +63,7 @@ class CasillaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Casilla
         fields = '__all__'
+        permission_classes = [IsAuthenticated]
     def create(self, validated_data):
         departamento_data = validated_data.pop('departamento')
         departamento_nombre = departamento_data['nombre']
@@ -68,15 +78,7 @@ class CasillaSerializer(serializers.ModelSerializer):
         else:
             return Casilla.objects.create(departamento=departamento, **validated_data)
         return casilla
-    # def to_representation(self, instance):
-    #     data = super().to_representation(instance)
-    #     # Filtrar por el departamento deseado (puedes cambiar el ID del departamento según tus necesidades)
-    #     departamento_id = 1
-    #     if data['departamento']['id'] == departamento_id:
-    #         return data
-    #     else:
-    #         return None
-        
+
 class AlquilerCasillasSerializer(serializers.ModelSerializer):
     num_casilla = serializers.IntegerField(source='fk_casilla.num_Casilla')
     departamento = serializers.CharField(source='fk_casilla.departamento.nombre')
@@ -87,6 +89,7 @@ class AlquilerCasillasSerializer(serializers.ModelSerializer):
     class Meta:
         model = AlquilerCasillas
         fields = ['id', 'num_casilla', 'departamento', 'fecha_inicio', 'fecha_fin', 'nro_contrato', 'fk_cliente']
+        permission_classes = [IsAuthenticated]
 
     def create(self, validated_data):
         fk_casilla_data = validated_data.pop('fk_casilla')

@@ -25,6 +25,8 @@
               ></v-autocomplete>
               <v-text-field label="Contraseña" v-model="password" type="password" required rounded variant="plain"></v-text-field>
               <v-text-field label="Confirmar contraseña" v-model="confirmPassword" type="password" required rounded variant="plain"></v-text-field>
+              <v-alert v-if="error" type="error">{{ error }}</v-alert>
+              <v-alert v-if="success" type="success">¡Registro exitoso!</v-alert>
               <v-card-actions class="mt-4">
                 <v-spacer></v-spacer>
                 <v-btn @click="register" type="submit" color="primary">Registrarse</v-btn>
@@ -51,6 +53,7 @@
         ci: null,
         firstName: null,
         lastName: null,
+        confirmPassword:null,
       };
     },
     created() {
@@ -90,13 +93,18 @@
         };
 
         axios
-          .post('http://172.65.14.246:8000/api/1.0/Register/', userData)
-          .then(response => {
-            // Aquí puedes manejar la respuesta de la API después de registrar al usuario
-            console.log(response.data);
-          })
-          .catch(error => {
-            console.error(error);
+        .post('http://172.65.14.246:8000/api/1.0/Register/', userData)
+        .then(response => {
+          // Registro exitoso
+          this.success = true;
+          this.error = null;
+          console.log(response.data);
+        })
+        .catch(error => {
+          // Error durante el registro
+          this.success = false;
+          this.error = error.message;
+          console.error(error);
           });
       },
     },
