@@ -14,16 +14,16 @@
                   <v-btn variant="plain">hola3</v-btn>
                 </v-col>
                 <v-col cols="auto">
-                  <v-btn @click="expand = !expand" variant="plain">Departamento</v-btn>
-                  <v-expand-transition>
-                    <v-card
-                      :elevation="24"
-                      v-show="expand"
-                      height="100"
-                      width="100"
-                      class="bg-withe"
-                    ></v-card>
-                  </v-expand-transition>
+                  <v-menu offset-y>
+                    <template v-slot:activator="{ on }">
+                      <v-btn v-on="on" variant="plain" id="activator">Departamento</v-btn>
+                    </template>
+                    <v-list>
+                      <v-list-item v-for="department in departments" :key="department" @click="selectDepartment(department)">
+                        <v-list-item-title>{{ department }}</v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
                 </v-col>
               </v-row>
             </v-card-subtitle>
@@ -72,6 +72,7 @@
   </v-container>
 </template>
 
+
 <script>
 import axios from 'axios';
 
@@ -81,7 +82,8 @@ export default {
       selectedItems: [],
       expand: false,
       drawer: true,
-      items: [] // Propiedad para almacenar los datos de la API
+      items: [], // Propiedad para almacenar los datos de la API
+      departments: [],// Propiedad para almacenar los departamentos de la API
     };
   },
   created() {
@@ -89,7 +91,18 @@ export default {
   },
   methods: {
     fetchData() {
-      // Realiza una solicitud a la API utilizando Axios (o cualquier otra librería de tu elección)
+      // Realiza una solicitud a la API para obtener los departamentos
+      axios
+        .get('http://172.65.14.246:8000/api/1.0/departamento/')
+        .then(response => {
+          this.departments = response.data.map(department => department.nombre); // Almacena los departamentos en la propiedad departments
+          console.log('Departamentos:', this.departments);
+        })
+        .catch(error => {
+          console.error(error);
+        });
+      
+      // Realiza una solicitud a la API para obtener los datos
       axios.get('http://172.65.14.246:8000/api/1.0/casillas/')
         .then(response => {
           this.items = response.data; // Almacena los datos en la propiedad items
@@ -98,9 +111,11 @@ export default {
         .catch(error => {
           console.error(error);
         });
+    },
+    selectDepartment(department) {
+      console.log('Departamento seleccionado:', department);
     }
   }
 };
 </script>
-
 

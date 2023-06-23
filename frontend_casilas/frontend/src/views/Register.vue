@@ -95,17 +95,23 @@
         axios
         .post('http://172.65.14.246:8000/api/1.0/Register/', userData)
         .then(response => {
-          // Registro exitoso
-          this.success = true;
-          this.error = null;
-          console.log(response.data);
+          // Comprobar el código de estado de la respuesta
+          if (response.status === 201) {
+            // Registro exitoso
+            this.success = true;
+            this.error = null;
+          } else {
+            // Manejar otros casos de código de estado
+            this.success = false;
+            this.error = 'Error en el registro';
+          }
         })
         .catch(error => {
           // Error durante el registro
           this.success = false;
           this.error = error.message;
           console.error(error);
-          });
+        });
       },
     },
   };
