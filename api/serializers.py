@@ -1,14 +1,15 @@
 
 from rest_framework import serializers
 from .models import Usuarios, Casilla, AlquilerCasillas,Departamento,Precio
+from .filters import CasillaFilter
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import Group
 from rest_framework import status
 from rest_framework.response import Response
-
+from rest_framework import filters
 from datetime import timedelta
 from rest_framework.permissions import IsAuthenticated
-
+from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth.password_validation import validate_password
 class PrecioSerializer(serializers.ModelSerializer):
     class Meta:
@@ -64,6 +65,8 @@ class CasillaSerializer(serializers.ModelSerializer):
         model = Casilla
         fields = '__all__'
         permission_classes = [IsAuthenticated]
+        filter_backends = [DjangoFilterBackend]
+        filterset_class = CasillaFilter
     def create(self, validated_data):
         departamento_data = validated_data.pop('departamento')
         departamento_nombre = departamento_data['nombre']
@@ -114,3 +117,8 @@ class AlquilerCasillasSerializer(serializers.ModelSerializer):
 
         alquiler_casillas = AlquilerCasillas.objects.create(fk_casilla=casilla, fk_cliente=usuario, **validated_data)
         return alquiler_casillas
+# class CasillaViewSet(viewsets.ModelViewSet):
+#     queryset = Casilla.objects.all()
+#     serializer_class = CasillaSerializer
+#     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+#     filterset_fields = {'departamento__nombre': ['exact', 'icontains']}

@@ -59,7 +59,7 @@
         };
   
         axios
-        .post('http://172.65.14.246:8000/api/1.0/login/', loginData)
+        .post('http://172.65.14.246:800/api/1.0/login/', loginData)
           .then(response => {
             // Guardar el token en el almacenamiento local del navegador
             localStorage.setItem('token', response.data.token);

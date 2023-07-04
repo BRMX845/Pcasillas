@@ -11,12 +11,12 @@
                   <v-btn variant="plain">Filtro</v-btn>
                 </v-col>
                 <v-col cols="auto">
-                  <v-btn variant="plain">hola3</v-btn>
+                  <v-btn variant="plain">buscar</v-btn>
                 </v-col>
                 <v-col cols="auto">
                   <v-menu offset-y>
-                    <template v-slot:activator="{ on }">
-                      <v-btn v-on="on" variant="plain" id="activator">Departamento</v-btn>
+                    <template v-slot:activator="{ props }">
+                      <v-btn v-bind="props" variant="plain" id="activator">Departamento</v-btn>
                     </template>
                     <v-list>
                       <v-list-item v-for="department in departments" :key="department" @click="selectDepartment(department)">
@@ -29,22 +29,11 @@
             </v-card-subtitle>
           </v-card-title>
           <v-card-text>
-            <v-navigation-drawer v-model="drawer" right>
-              <v-list dense>
-                <v-list-item v-for="item in selectedItems" :key="item">
-                  <v-list-item-content>{{ item }}<v-divider></v-divider></v-list-item-content>
-                </v-list-item>
-              </v-list>
-            </v-navigation-drawer>
+            
             <v-item-group v-model="selectedItems" multiple>
               <v-container>
                 <v-row justify="space-between">
-                  <v-col
-                    v-for="item in items"
-                    :key="item.id"
-                    cols="auto"
-                    md="1"
-                  >
+                  <v-col v-for="item in items" :key="item.id" cols="auto" md="1">
                     <v-item v-slot="{ isSelected, toggle }">
                       <v-card
                         :color="isSelected ? 'primary' : ''"
@@ -73,6 +62,7 @@
 </template>
 
 
+
 <script>
 import axios from 'axios';
 
@@ -96,7 +86,6 @@ export default {
         .get('http://172.65.14.246:8000/api/1.0/departamento/')
         .then(response => {
           this.departments = response.data.map(department => department.nombre); // Almacena los departamentos en la propiedad departments
-          console.log('Departamentos:', this.departments);
         })
         .catch(error => {
           console.error(error);
