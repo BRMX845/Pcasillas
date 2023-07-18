@@ -1,0 +1,16 @@
+from api.models import Usuarios
+from django.contrib.auth.hashers import make_password
+from api.models import Departamento
+departamento = Departamento.objects.get(dep='La Paz')
+
+user = Usuarios(
+    username='agbc2',
+    email='agbc@example.com',
+    password=make_password('Correos.2022'),
+    celular=123456789,
+    ci=1234567890,
+    departamento=departamento
+)
+user.is_superuser = True
+user.is_staff = True
+user.save()
