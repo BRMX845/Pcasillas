@@ -1,7 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import viewsets, filters
 #from django.shortcuts import render
 from rest_framework import viewsets
-from rest_framework.response import Response
 from .models import Usuarios,Departamento,Casilla,AlquilerCasillas
 from .serializers import UsuariosSerializer,DepartamentoSerializer,CasillaSerializer ,AlquilerCasillasSerializer
 from .filters import CasillaFilter
@@ -16,8 +16,10 @@ class DepartamentoViewSet(viewsets.ModelViewSet):
 class CasillasViewSet(viewsets.ModelViewSet):
     queryset=Casilla.objects.all()
     serializer_class=CasillaSerializer
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_class = CasillaFilter
+    ordering_fields = ['num_Casilla']
+    ordering = ['num_Casilla']
 class AlquilerCasillasViewSet(viewsets.ModelViewSet):
     queryset=AlquilerCasillas.objects.all()
     serializer_class=AlquilerCasillasSerializer

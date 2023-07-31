@@ -11,7 +11,7 @@
                   <v-btn variant="plain">Filtro</v-btn>
                 </v-col>
                 <v-col cols="auto">
-                  <v-btn variant="plain">buscar</v-btn>
+                  <v-btn variant="plain">Buscar</v-btn>
                 </v-col>
                 <v-col cols="auto">
                   <v-menu offset-y>
@@ -29,23 +29,23 @@
             </v-card-subtitle>
           </v-card-title>
           <v-card-text>
-            
             <v-item-group v-model="selectedItems" multiple>
               <v-container>
                 <v-row justify="space-between">
                   <v-col v-for="item in items" :key="item.id" cols="auto" md="1">
                     <v-item v-slot="{ isSelected, toggle }">
                       <v-card
-                        :color="isSelected ? 'primary' : ''"
+                        :color="isSelected ? 'primary' : getItemColor(item.estado)"
                         class="d-flex align-center"
                         dark
                         height="100"
                         width="100"
                         @click="toggle"
+                        :disabled="item.estado === 'Ocupado'"
                       >
                         <v-scroll-y-transition>
                           <div class="flex-grow-1 text-center">
-                            {{ isSelected ? 'Seleccionado' : item.id }}
+                            {{ isSelected ? 'Seleccionado' : item.num_Casilla }}
                           </div>
                         </v-scroll-y-transition>
                       </v-card>
@@ -62,7 +62,6 @@
 </template>
 
 
-
 <script>
 import axios from 'axios';
 
@@ -73,7 +72,7 @@ export default {
       expand: false,
       drawer: true,
       items: [], // Propiedad para almacenar los datos de la API
-      departments: [],// Propiedad para almacenar los departamentos de la API
+      departments: [], // Propiedad para almacenar los departamentos de la API
     };
   },
   created() {
@@ -83,16 +82,17 @@ export default {
     fetchData() {
       // Realiza una solicitud a la API para obtener los departamentos
       axios
-        .get('http://172.65.14.246:8000/api/1.0/departamento/')
+        .get('http://172.65.14.180:8000/api/1.0/departamento/')
         .then(response => {
           this.departments = response.data.map(department => department.nombre); // Almacena los departamentos en la propiedad departments
         })
         .catch(error => {
           console.error(error);
         });
-      
+
       // Realiza una solicitud a la API para obtener los datos
-      axios.get('http://172.65.14.246:8000/api/1.0/casillas/')
+      axios
+        .get('http://172.65.14.180:8000/api/1.0/casillas/')
         .then(response => {
           this.items = response.data; // Almacena los datos en la propiedad items
           console.log(response.data);
@@ -102,9 +102,26 @@ export default {
         });
     },
     selectDepartment(department) {
-      console.log('Departamento seleccionado:', department);
-    }
-  }
+      const url = `http://172.65.14.180:8000/api/1.0/casillas/?departamento__nombre=${department}&ordering=num_Casilla`;
+
+      axios
+        .get(url)
+        .then(response => {
+          this.items = response.data;
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
+    getItemColor(estado) {
+      if (estado === 'Vigente') {
+        return 'green';
+      } else if (estado === 'Ocupado') {
+        return 'red';
+      }
+      return '';
+    },
+  },
 };
 </script>
 

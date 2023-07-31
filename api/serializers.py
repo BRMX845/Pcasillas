@@ -41,13 +41,11 @@ class UsuariosSerializer(serializers.ModelSerializer):
         user = Usuarios.objects.create_user(departamento=departamento,**validated_data)
         group = Group.objects.get(name='cliente') # Cambia el nombre del grupo aquí
         user.groups.add(group)
-        response_data = {
-            'success': True,
-            'message': 'Usuario creado exitosamente.',
-            'user': self.data
-        }
 
-        return Response(response_data, status=status.HTTP_201_CREATED)
+        return {
+            'success': True,
+            'message': 'Usuario creado exitosamente.'
+        }
 
 class NombreUsuarioSerializer(serializers.ModelSerializer):
     class Meta:
@@ -117,8 +115,3 @@ class AlquilerCasillasSerializer(serializers.ModelSerializer):
 
         alquiler_casillas = AlquilerCasillas.objects.create(fk_casilla=casilla, fk_cliente=usuario, **validated_data)
         return alquiler_casillas
-# class CasillaViewSet(viewsets.ModelViewSet):
-#     queryset = Casilla.objects.all()
-#     serializer_class = CasillaSerializer
-#     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-#     filterset_fields = {'departamento__nombre': ['exact', 'icontains']}

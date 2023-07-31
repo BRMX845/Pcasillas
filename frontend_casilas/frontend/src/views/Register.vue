@@ -62,7 +62,7 @@
     methods: {
       getDepartments() {
         axios
-          .get('http://172.65.14.246:8000/api/1.0/departamento/') // Ruta de tu API para obtener los departamentos
+          .get('http://172.65.14.180:8000/api/1.0/departamento/') // Ruta de tu API para obtener los departamentos
           .then(response => {
             this.departments = response.data.map(department => department.nombre);
           })
@@ -93,7 +93,7 @@
         };
 
         axios
-        .post('http://172.65.14.246:8000/api/1.0/Register/', userData)
+        .post('http://172.65.14.180:8000/api/1.0/Register/', userData)
         .then(response => {
           // Comprobar el código de estado de la respuesta
           if (response.status === 201) {
